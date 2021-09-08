@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.media.mapper.ActorMapper">
+
+    <resultMap type="Actor" id="ActorResult">
+        <result property="actorId"    column="actor_id"    />
+        <result property="name"    column="name"    />
+        <result property="avatar"    column="avatar"    />
+        <result property="description"    column="description"    />
+        <result property="awards"    column="awards"    />
+        <result property="label"    column="label"    />
+    </resultMap>
+
+    <sql id="selectActorVo">
+        select actor_id, name, avatar, description, awards, label from wm_actor
+    </sql>
+
+    <select id="selectActorList" parameterType="Actor" resultMap="ActorResult">
+        <include refid="selectActorVo"/>
+        <where>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="avatar != null  and avatar != ''"> and avatar = #{avatar}</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+            <if test="awards != null  and awards != ''"> and awards = #{awards}</if>
+            <if test="label != null  and label != ''"> and label = #{label}</if>
+        </where>
+    </select>
+
+
+    <select id="selectHotActorList" parameterType="Actor" resultMap="ActorResult">
+        <include refid="selectActorVo"/>
+        limit  #{top}
+    </select>
+
+    <select id="selectNotSelectedListByIds"  resultMap="ActorResult">
+        select * from wm_actor
+        <where>
+            <if test="actor.name != null  and actor.name != ''"> and name like concat('%', #{actor.name}, '%')</if>
+            <if test="actor.avatar != null  and actor.avatar != ''"> and avatar = #{actor.avatar}</if>
+            <if test="actor.description != null  and actor.description != ''">and description like concat('%', #{actor.description}, '%')</if>
+            <if test="actor.awards != null  and actor.awards != ''"> and awards  like concat('%', #{actor.awards}, '%')</if>
+            <if test="actor.label != null  and actor.label != ''"> and label = #{actor.label}</if>
+            <if test="actorIds != null  and actorIds.length != 0">
+                and  actor_id not in
+                <foreach item="actorId" collection="actorIds" open="(" separator="," close=")">
+                    #{actorId}
+                </foreach>
+             </if>
+        </where>
+
+    </select>
+
+
+</mapper>
